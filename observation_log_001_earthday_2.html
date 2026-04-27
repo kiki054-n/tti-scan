@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>観察ログ 001 — TTI-SCAN Field Record</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a18;
+  --paper: #f5f2eb;
+  --accent: #2d5a3d;
+  --accent2: #8b4513;
+  --muted: #6b6860;
+  --border: #d4cfbf;
+  --tag-bg: #e8e4d8;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 300;
+  line-height: 1.9;
+  min-height: 100vh;
+}
+
+.noise {
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrapper {
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 80px 40px 120px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header */
+.log-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 40px;
+  margin-bottom: 60px;
+}
+
+.log-meta {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.log-meta span {
+  display: inline-block;
+  margin-right: 24px;
+}
+
+.log-number {
+  font-family: 'Space Mono', monospace;
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--border);
+  line-height: 1;
+  margin-bottom: -12px;
+  display: block;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* Sections */
+.section {
+  margin-bottom: 56px;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 0.6s ease forwards;
+}
+
+.section:nth-child(1) { animation-delay: 0.1s; }
+.section:nth-child(2) { animation-delay: 0.2s; }
+.section:nth-child(3) { animation-delay: 0.3s; }
+.section:nth-child(4) { animation-delay: 0.4s; }
+.section:nth-child(5) { animation-delay: 0.5s; }
+.section:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Axis grid */
+.axis-grid {
+  display: grid;
+  gap: 2px;
+}
+
+.axis-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+}
+
+.axis-row:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.axis-tag {
+  background: var(--tag-bg);
+  padding: 12px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent2);
+  display: flex;
+  align-items: flex-start;
+  border-right: 1px solid var(--border);
+  font-weight: 700;
+}
+
+.axis-tag small {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.axis-content {
+  padding: 12px 16px;
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+/* Discovery box */
+.discovery {
+  background: var(--accent);
+  color: #f0ede4;
+  padding: 32px 36px;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.discovery::before {
+  content: '発見';
+  position: absolute;
+  right: 24px;
+  top: 20px;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  opacity: 0.4;
+  text-transform: uppercase;
+}
+
+.discovery p {
+  font-size: 15px;
+  line-height: 1.9;
+}
+
+.discovery strong {
+  font-weight: 700;
+  display: block;
+  font-size: 17px;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+/* Classification */
+.classification {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.class-card {
+  border: 1px solid var(--border);
+  padding: 20px 24px;
+}
+
+.class-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.class-card.destructive h4 { color: #8b2020; }
+.class-card.excitative h4 { color: var(--accent); }
+
+.class-card p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* Vectors */
+.vector-list {
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.vector-list li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.vector-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  padding-top: 2px;
+}
+
+.vector-text {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Commit block */
+.commit {
+  background: #1a1a18;
+  color: #a8d8a8;
+  padding: 20px 24px;
+  border-radius: 2px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.commit .path { color: #f0e68c; }
+.commit .msg { color: #87ceeb; }
+
+/* Footer */
+.log-footer {
+  margin-top: 80px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.footer-brand {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.footer-brand strong {
+  display: block;
+  color: var(--ink);
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.theory {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+  line-height: 1.8;
+}
+
+@media (max-width: 600px) {
+  .wrapper { padding: 48px 24px 80px; }
+  .classification { grid-template-columns: 1fr; }
+  .axis-row { grid-template-columns: 1fr; }
+  .axis-tag { border-right: none; border-bottom: 1px solid var(--border); }
+  .log-footer { flex-direction: column; gap: 24px; }
+  .theory { text-align: left; }
+}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="wrapper">
+
+  <!-- Header -->
+  <header class="log-header">
+    <div class="log-meta">
+      <span>TTI-SCAN</span>
+      <span>Field Record</span>
+      <span>Shiojiri / Matsumoto</span>
+    </div>
+    <span class="log-number">001</span>
+    <h1>アースデイカフェ<br>観察ログ</h1>
+    <p class="subtitle">サンサンガク（松本）— 2026年4月27日　記録者：川上真潔</p>
+  </header>
+
+  <!-- Section 1: Axes -->
+  <section class="section">
+    <div class="section-label">観察した歪み — 6軸分析</div>
+    <div class="axis-grid">
+      <div class="axis-row">
+        <div class="axis-tag">xX<small>空間・行動</small></div>
+        <div class="axis-content">リニア（生産→消費→廃棄）の一方向フローが支配的。修理・循環の行動が社会設計から抜け落ちている。</div>
+      </div>
+      <div class="axis-row">
+        <div class="axis-tag">yY<small>時間・経験</small></div>
+        <div class="axis-content">難民が「声をかけられた社会」の記憶を持ちながら、現在の閉塞した社会で生きている。時間軸の断絶。</div>
+      </div>
+      <div class="axis-row">
+        <div class="axis-tag">zZ<small>場・関係</small></div>
+        <div class="axis-content">個人主義が優先され、隣人との場が消えた。リペアカフェはその場を物理的に再生する装置である。</div>
+      </div>
+      <div class="axis-row">
+        <div class="axis-tag">rR<small>欲求・意志</small></div>
+        <div class="axis-content">「直したい」という欲求が、コミュニティへの参加動機になっている。欲求そのものがスイッチになる。</div>
+      </div>
+      <div class="axis-row">
+        <div class="axis-tag">私私<small>関係性・共感</small></div>
+        <div class="axis-content">教える・盗む・伝承する——無知であることが関係を生む。弱さ・欠如が接続点になる。</div>
+      </div>
+      <div class="axis-row">
+        <div class="axis-tag">jJ<small>倫理・全体</small></div>
+        <div class="axis-content">友朋共生。共に生きることが個人の生きがいと一致する。利己と利他が同じ方向を向く瞬間。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Discovery -->
+  <section class="section">
+    <div class="section-label">核心的発見</div>
+    <div class="discovery">
+      <strong>「盗むことが伝承の証となって幸せにつながる」</strong>
+      <p>悪い意味の「盗む」が、生命の伝播メカニズムの本質である。無知という歪みが励起され、次の人へ伝播し、スイッチが入り、成長しあう。ベクトルの歪みが励起して次の人に伝播し、生命の営みの根源がここにある。</p>
+    </div>
+  </section>
+
+  <!-- Section 3: Theory update -->
+  <section class="section">
+    <div class="section-label">理論への追加 — 歪みの二分類</div>
+    <div class="classification">
+      <div class="class-card destructive">
+        <h4>破壊的歪み</h4>
+        <p>収束ベクトルで修正が必要。球を変形させ崩壊へ向かわせる外力。戦争・権力の乱用・行政のOS的バグなど。</p>
+      </div>
+      <div class="class-card excitative">
+        <h4>励起的歪み</h4>
+        <p>伝播・成長のエネルギー源として活用すべき歪み。無知・欠如・欲求が他者との接続を生む。リペアカフェはこれを意図的に設計した空間。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Yuuhou -->
+  <section class="section">
+    <div class="section-label">友朋共生とTTI理論の接続</div>
+    <p style="font-size:14.5px;line-height:1.9;">jJ軸（倫理・全体貢献）の具体的な姿が「友朋共生」である。球の振動が共鳴して他の球のスイッチを入れるという理論が、アムステルダムのリペアカフェで実際に起きていた。このモデルが塩尻・松本で再現可能かどうかが次の検証課題となる。</p>
+  </section>
+
+  <!-- Section 5: Convergence vectors -->
+  <section class="section">
+    <div class="section-label">収束ベクトルの候補</div>
+    <ul class="vector-list">
+      <li>
+        <span class="vector-num">V1</span>
+        <span class="vector-text">松本・塩尻にリペアカフェ型の「場」を作る——励起的歪みを意図的に設計する。サンサンガクが運営主体になれる。</span>
+      </li>
+      <li>
+        <span class="vector-num">V2</span>
+        <span class="vector-text">「盗む・教える」の関係をサンサンガクのプログラムに組み込む。無知を入口にしたコミュニティ設計。</span>
+      </li>
+      <li>
+        <span class="vector-num">V3</span>
+        <span class="vector-text">友朋共生を塩尻市政への提言の核心概念として使う。jJ軸の言語化として首長に届けられる。</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Section 6: Commit -->
+  <section class="section">
+    <div class="section-label">GitHubコミット情報</div>
+    <div class="commit">
+      <span class="path">tti-scan/logs/20260427_matsumoto_earthday.html</span><br>
+      <span class="msg">Add field log 001: Earthday Cafe observation, repair film insight</span><br>
+      <span style="color:#888;margin-top:4px;display:block">2026-04-27 — kiki054-n</span>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="log-footer">
+    <div class="footer-brand">
+      <strong>TTI-SCAN</strong>
+      Tri-Tetra Integrator<br>
+      Strain-Convergence ANalyzer<br>
+      © 2026 川上真潔 / MIT License
+    </div>
+    <div class="theory">
+      P = xX + yY + zZ + rR + 私私 + jJ<br>
+      E = (xX+yY+zZ) ⊗ (ωx,ωy,ωz) + rR + 私私 + jJ<br>
+      <span style="font-size:10px;opacity:0.6">存在は回転し続けるプロセスである</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
