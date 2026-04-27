@@ -2,7 +2,7 @@
 # TTI-SCAN
 ## Tri-Tetra Integrator Strain-Convergence ANalyzer
 
-**初版記録日：2026年4月27日**
+**初版記録日：2026年4月26日**
 
 ### 理論的基盤
 P = xX + yY + zZ + rR + 私私 + jJ
