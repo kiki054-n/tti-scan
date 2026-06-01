@@ -3,7 +3,7 @@
 
 **初版記録日：2026年4月27日**  
 **開発者：川上真潔 / kiki054-n**  
-**ライセンス：MIT**
+**ライセンス：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ja)**
 
 ---
 
@@ -131,10 +131,61 @@ TTI-SCANを社会に実装し、理論の正しさを検証する。
 
 ---
 
-## 特記事項
+## 使ってみた・試してみた（事例を募集しています）
 
-本フレームワークの理論・実装は川上真潔が独自に構築したものです。  
-MITライセンスのもとで公開しますが、理論の核心部分については  
-特許出願を検討中です（2026年4月）。
+TTI-SCANは「広く使われること」が理論の検証になります。  
+使用した事例・感想・改善提案をぜひ共有してください。
 
-© 2026 川上真潔 / MIT License
+### 報告の方法
+
+**GitHub Discussions**（推奨）  
+→ [Discussions タブ](../../discussions) から「使ってみた報告」カテゴリに投稿してください。
+
+**報告に含めていただきたい内容（自由形式でOK）**
+
+```
+【対象】どんな場面・組織・地域に適用したか
+【入力】どの軸に歪みを設定したか
+【出力】どんな収束ベクトルが得られたか
+【結果】実際に役立ったか、どう使ったか
+【感想】改善点・疑問点など
+```
+
+事例は川上真潔が定期的にまとめ、検証レポートとして公開します。  
+あなたの実践がTTI理論の発展に貢献します。
+
+---
+
+## 帰属（Attribution）について
+
+本フレームワークはCC BY 4.0のもとで公開しています。  
+**自由に使用・改変・再配布できます。商用利用も可能です。**  
+ただし、使用・引用の際は以下の帰属表記をお願いします。
+
+```
+TTI-SCAN / Tri-Tetra Integrator
+開発者：川上真潔（Masaaki Kawakami）
+出典：https://github.com/kiki054-n/tti-scan
+ライセンス：CC BY 4.0
+```
+
+論文・レポートでの引用例：
+
+> 川上真潔（2026）. TTI-SCAN: Tri-Tetra Integrator — Strain-Convergence ANalyzer.
+> GitHub. https://github.com/kiki054-n/tti-scan (CC BY 4.0)
+
+---
+
+## 関連理論
+
+- **双極ゼロの理論**（Theory of Bipolar Zero）  
+  DOI: [10.5281/zenodo.19704117](https://zenodo.org/records/19704117)  
+  TTI理論の数理的基盤。Y = 1/X という単一公理から構造の全体を導出する。
+
+- **関係性創生論**（Relational Genesis Theory）  
+  GitHub: [kiki054-n/ttt](https://github.com/kiki054-n/ttt)  
+  宇宙の起源を「関係性」から論じる宇宙論的フレームワーク。
+
+---
+
+© 2026 川上真潔 / [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ja)
