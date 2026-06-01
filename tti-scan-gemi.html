@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TTI-SCAN — 歪み検出器</title>
+<title>TTI-SCAN — 歪み検出器（Gemini）</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -11,6 +11,7 @@
   --border:#2a2e2a; --green:#4ade80; --green-dim:#1a3d26;
   --amber:#fbbf24; --amber-dim:#3d2e0a;
   --red:#f87171; --blue:#60a5fa;
+  --purple:#c084fc; --purple-dim:#2d1a40;
   --text:#e8ead8; --muted:#6b7260;
   --mono:'DM Mono',monospace; --serif:'Noto Serif JP',serif;
 }
@@ -19,49 +20,82 @@ body{background:var(--bg);color:var(--text);font-family:var(--serif);font-weight
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(74,222,128,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(74,222,128,.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 .app{max-width:860px;margin:0 auto;padding:48px 24px 120px;position:relative;z-index:1;}
 
-/* Header */
-.logo{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--green);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
-.logo::before{content:'';width:24px;height:1px;background:var(--green);display:inline-block;}
+.back-link{font-family:var(--mono);font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:.1em;display:inline-flex;align-items:center;gap:6px;margin-bottom:32px;transition:color .15s;}
+.back-link:hover{color:var(--amber);}
+
+.logo{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--amber);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.logo::before{content:'';width:24px;height:1px;background:var(--amber);display:inline-block;}
 h1{font-size:clamp(28px,5vw,44px);font-weight:700;line-height:1.1;margin-bottom:12px;}
-h1 span{color:var(--green);}
+h1 span{color:var(--amber);}
 .tagline{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.05em;}
 
-/* Eq bar */
-.eq-bar{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);padding:16px 20px;margin:32px 0 48px;font-family:var(--mono);font-size:12px;color:var(--muted);line-height:2;}
+.eq-bar{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);padding:16px 20px;margin:32px 0 48px;font-family:var(--mono);font-size:12px;color:var(--muted);line-height:2;}
 .eq-bar strong{color:var(--text);}
 
-/* Steps */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:48px;}
 .step{background:var(--surface);border:1px solid var(--border);padding:16px;text-align:center;}
-.step-num{font-family:var(--mono);font-size:24px;color:var(--green);font-weight:500;display:block;margin-bottom:6px;}
+.step-num{font-family:var(--mono);font-size:24px;color:var(--amber);font-weight:500;display:block;margin-bottom:6px;}
 .step-text{font-size:12px;color:var(--muted);line-height:1.5;}
 
-/* Input */
-.input-label{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);margin-bottom:10px;display:block;}
-textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--serif);font-size:15px;padding:20px;resize:vertical;min-height:130px;outline:none;transition:border-color .2s;line-height:1.8;}
-textarea:focus{border-color:var(--green);}
+.input-label{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);margin-bottom:10px;display:block;}
+textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--serif);font-size:15px;padding:20px;resize:vertical;outline:none;transition:border-color .2s;line-height:1.8;}
+textarea:focus{border-color:var(--amber);}
 textarea::placeholder{color:var(--muted);font-style:italic;}
-.btn{margin-top:12px;background:var(--green);color:#0d0f0e;border:none;padding:14px 32px;font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.1em;cursor:pointer;transition:opacity .15s,transform .1s;display:inline-flex;align-items:center;gap:8px;}
+
+.self-block{
+  margin-top:20px;
+  background:var(--purple-dim);
+  border:1px solid #7c3aed44;
+  border-left:3px solid var(--purple);
+  border-radius:2px;
+  padding:20px;
+}
+.self-label{
+  font-family:var(--mono);
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--purple);
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.self-label small{
+  font-size:10px;
+  letter-spacing:0;
+  text-transform:none;
+  color:var(--muted);
+  font-family:var(--serif);
+}
+.self-hint{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7;}
+.self-textarea{
+  background:var(--surface);
+  border-color:#7c3aed44;
+  min-height:90px;
+  font-size:14px;
+}
+.self-textarea:focus{border-color:var(--purple);}
+
+.btn{margin-top:20px;background:var(--amber);color:#0d0f0e;border:none;padding:14px 32px;font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.1em;cursor:pointer;transition:opacity .15s,transform .1s;display:inline-flex;align-items:center;gap:8px;}
 .btn:hover{opacity:.85;}
 .btn:active{transform:scale(.98);}
 .btn.secondary{background:transparent;border:1px solid var(--border);color:var(--muted);margin-left:8px;}
 .btn.secondary:hover{border-color:var(--text);color:var(--text);}
 
-/* Prompt output */
 #promptSection{display:none;margin-top:40px;}
 #promptSection.show{display:block;animation:fadeUp .4s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-.prompt-box{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--green);padding:0;}
+.prompt-box{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--amber);padding:0;}
 .prompt-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--border);}
-.prompt-header-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);}
-.copy-btn{font-family:var(--mono);font-size:11px;background:var(--green-dim);color:var(--green);border:1px solid var(--green);padding:6px 14px;cursor:pointer;transition:all .15s;letter-spacing:.05em;}
-.copy-btn:hover{background:var(--green);color:#0d0f0e;}
-.copy-btn.copied{background:var(--green);color:#0d0f0e;}
+.prompt-header-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--amber);}
+.copy-btn{font-family:var(--mono);font-size:11px;background:var(--amber-dim);color:var(--amber);border:1px solid var(--amber);padding:6px 14px;cursor:pointer;transition:all .15s;letter-spacing:.05em;}
+.copy-btn:hover{background:var(--amber);color:#0d0f0e;}
+.copy-btn.copied{background:var(--amber);color:#0d0f0e;}
 #promptText{padding:20px;font-family:var(--mono);font-size:12px;line-height:1.9;white-space:pre-wrap;word-break:break-all;color:#b0b890;max-height:360px;overflow-y:auto;}
 
-/* Next step box */
-.next-box{margin-top:16px;background:var(--amber-dim);border:1px solid var(--amber);padding:20px 24px;display:grid;grid-template-columns:24px 1fr;gap:12px;}
+.next-box{margin-top:16px;background:#1a1200;border:1px solid var(--amber);padding:20px 24px;display:grid;grid-template-columns:24px 1fr;gap:12px;}
 .next-icon{color:var(--amber);font-size:16px;padding-top:2px;}
 .next-body{font-size:13.5px;line-height:1.8;}
 .next-body strong{color:var(--amber);display:block;margin-bottom:6px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;}
@@ -69,17 +103,14 @@ textarea::placeholder{color:var(--muted);font-style:italic;}
 .gemini-link{display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#0d0f0e;font-family:var(--mono);font-size:12px;font-weight:500;padding:10px 20px;text-decoration:none;transition:opacity .15s;}
 .gemini-link:hover{opacity:.85;}
 
-/* Result input area */
 #resultSection{display:none;margin-top:40px;}
 #resultSection.show{display:block;animation:fadeUp .4s ease;}
 .sec-head{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:0 0 16px;display:flex;align-items:center;gap:12px;}
 .sec-head::after{content:'';flex:1;height:1px;background:var(--border);}
-.sec-head.green{color:var(--green);}
 .result-paste{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--serif);font-size:14px;padding:20px;resize:vertical;min-height:200px;outline:none;transition:border-color .2s;line-height:1.8;}
-.result-paste:focus{border-color:var(--green);}
+.result-paste:focus{border-color:var(--amber);}
 .result-paste::placeholder{color:var(--muted);font-size:13px;}
 
-/* Axis grid */
 .axis-grid{display:grid;gap:2px;margin-bottom:32px;}
 .axis-card{background:var(--surface);border:1px solid var(--border);display:grid;grid-template-columns:100px 1fr;}
 .axis-tag{background:var(--surface2);border-right:1px solid var(--border);padding:16px;display:flex;flex-direction:column;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:500;}
@@ -96,7 +127,9 @@ textarea::placeholder{color:var(--muted);font-style:italic;}
 .strain-fill.e{background:var(--green);}
 .strain-fill.n{background:var(--muted);}
 
-/* Vectors */
+.axis-card.self-axis{border-color:#7c3aed55;}
+.axis-card.self-axis .axis-tag{color:var(--purple);}
+
 .vector-list{display:grid;gap:10px;margin-bottom:32px;}
 .vector-card{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--amber);padding:18px 22px;display:grid;grid-template-columns:28px 1fr;gap:14px;}
 .vector-num{font-family:var(--mono);font-size:11px;color:var(--amber);padding-top:2px;}
@@ -107,7 +140,6 @@ textarea::placeholder{color:var(--muted);font-style:italic;}
 .pill.axis{background:var(--green-dim);color:var(--green);}
 .pill.method{background:var(--amber-dim);color:var(--amber);}
 
-/* Resolution */
 .resolution{background:var(--surface);border:1px solid var(--border);border-top:2px solid var(--blue);padding:24px 28px;}
 .resolution h3{font-size:16px;font-weight:700;color:var(--blue);margin-bottom:10px;}
 .resolution p{font-size:13.5px;line-height:1.85;color:#b0b8a0;margin-bottom:12px;}
@@ -115,11 +147,20 @@ textarea::placeholder{color:var(--muted);font-style:italic;}
 .resolution li{font-size:13px;padding-left:20px;position:relative;line-height:1.7;}
 .resolution li::before{content:'→';position:absolute;left:0;color:var(--blue);font-family:var(--mono);}
 
-/* Footer */
+.self-summary{
+  background:var(--purple-dim);
+  border:1px solid #7c3aed44;
+  border-top:2px solid var(--purple);
+  padding:24px 28px;
+  margin-bottom:24px;
+}
+.self-summary h3{font-size:15px;font-weight:700;color:var(--purple);margin-bottom:10px;}
+.self-summary p{font-size:13px;color:#c4b0e0;line-height:1.85;}
+
 footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;}
 .footer-brand{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;}
-.footer-brand strong{color:var(--text);display:block;margin-bottom:4px;}
-.footer-eq{font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.9;text-align:right;}
+.footer-brand strong{color:var(--text);display:block;font-size:13px;margin-bottom:4px;}
+.footer-eq{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:right;line-height:1.9;}
 
 @media(max-width:600px){
   .steps{grid-template-columns:1fr;}
@@ -134,27 +175,42 @@ footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);displ
 <body>
 <div class="app">
 
+  <a class="back-link" href="index.html">← エンジン選択に戻る</a>
+
   <header>
-    <div class="logo">TTI-SCAN v1.0</div>
+    <div class="logo">TTI-SCAN v1.1 — Gemini</div>
     <h1>Strain-Convergence<br><span>ANalyzer</span></h1>
     <p class="tagline">Tri-Tetra Integrator — 歪み検出器 / 川上真潔 2026</p>
   </header>
 
   <div class="eq-bar">
-    <strong>P = xX + yY + zZ + rR + iI + jJ</strong><br>
-    E = (xX+yY+zZ) ⊗ (ωx,ωy,ωz) + rR + iI + jJ<br>
+    <strong>P = xX + yY + zZ + rR + 私私 + jJ</strong><br>
+    E = (xX+yY+zZ) ⊗ (ωx,ωy,ωz) + rR + 私私 + jJ<br>
     <span style="font-size:11px;">存在は「規定」ではなく「回転し続けるプロセス」である。回転が止まれば存在は双極の0に還る。</span>
   </div>
 
   <div class="steps">
-    <div class="step"><span class="step-num">01</span><div class="step-text">課題を入力してプロンプトを生成</div></div>
+    <div class="step"><span class="step-num">01</span><div class="step-text">課題と自分の思いを入力してプロンプトを生成</div></div>
     <div class="step"><span class="step-num">02</span><div class="step-text">プロンプトをコピーしてGeminiに貼り付け</div></div>
     <div class="step"><span class="step-num">03</span><div class="step-text">Geminiの回答をここに貼り付けて可視化</div></div>
   </div>
 
   <div style="margin-bottom:40px;">
     <label class="input-label" for="issue">STEP 01 — 課題・問題を入力</label>
-    <textarea id="issue" placeholder="例：松本城だけで観光が終わり、塩尻のワイナリーや精密産業に観光客が来ない。行政も縦割りで圏域として機能していない。市民のホスピタリティも薄く、リピーターが育たない。"></textarea>
+    <textarea id="issue" style="min-height:130px;" placeholder="例：松本城だけで観光が終わり、塩尻のワイナリーや精密産業に観光客が来ない。行政も縦割りで圏域として機能していない。市民のホスピタリティも薄く、リピーターが育たない。"></textarea>
+
+    <div class="self-block">
+      <div class="self-label">
+        私私 軸 — 自己申告
+        <small>（任意）あなた自身の思い・立場を入力すると分析が個人化されます</small>
+      </div>
+      <p class="self-hint">
+        「自分はこう感じている」「こうしたい・こうなりたい」「この問題に対して自分はどこにいるか」を自由に書いてください。<br>
+        ここに書いた内容が <strong style="color:var(--purple);">私私軸</strong> として分析に組み込まれ、収束ベクトルが自分視点に変化します。
+      </p>
+      <textarea class="self-textarea" id="selfInput" placeholder="例：自分はワイナリーを経営していたが売却した。今は地域の産業と観光を繋ぐ仕組みを作りたいと思っている。行政との間に歪みを感じており、自分が動くべきかどうか迷っている。"></textarea>
+    </div>
+
     <button class="btn" onclick="generatePrompt()">▶ プロンプトを生成</button>
   </div>
 
@@ -186,7 +242,14 @@ footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);displ
     <button class="btn secondary" onclick="clearResult()">クリア</button>
 
     <div id="vizResult" style="display:none;margin-top:40px;">
-      <div class="sec-head green">6軸 歪みマップ</div>
+      <div id="selfSummaryBlock" style="display:none;">
+        <div class="sec-head" style="color:var(--purple)">私私軸 — あなたの視点</div>
+        <div class="self-summary">
+          <h3>入力された自己ベクトル</h3>
+          <p id="selfSummaryText"></p>
+        </div>
+      </div>
+      <div class="sec-head" style="color:var(--green)">6軸 歪みマップ</div>
       <div class="axis-grid" id="axisGrid"></div>
       <div class="sec-head" style="color:var(--amber)">収束ベクトルの候補</div>
       <div class="vector-list" id="vectorList"></div>
@@ -199,7 +262,7 @@ footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);displ
     <div class="footer-brand">
       <strong>TTI-SCAN</strong>
       Tri-Tetra Integrator Strain-Convergence ANalyzer<br>
-      © 2026 川上真潔 / MIT License
+      © 2026 川上真潔 / CC BY 4.0
     </div>
     <div class="footer-eq">
       xX 空間・行動 / yY 時間・経験 / zZ 場・関係<br>
@@ -222,19 +285,24 @@ const AXES = [
 function generatePrompt(){
   const issue = document.getElementById('issue').value.trim();
   if(!issue){ alert('課題を入力してください。'); return; }
+  const selfInput = document.getElementById('selfInput').value.trim();
+
+  const selfSection = selfInput
+    ? `\n【私私軸 — 分析者自身の思い・立場】\n${selfInput}\n\n※ 上記は分析者本人が入力した自己申告です。私私軸（関係性・共感）の分析にはこの内容を核として反映してください。また収束ベクトルは、この人物の立場・動機・意志と整合するように設計してください。`
+    : '';
 
   const prompt = `あなたはTTI-SCAN（Tri-Tetra Integrator Strain-Convergence ANalyzer）です。
 川上真潔が開発したトライテトラ理論に基づき、以下の課題を6軸で分析してください。
 
 【分析する課題】
 ${issue}
-
+${selfSection}
 【TTI理論の6軸】
 - xX: 空間・行動（物理外殻①）外の世界での物理的活動
 - yY: 時間・経験（物理外殻②）他者・環境との接触履歴
 - zZ: 場・関係（物理外殻③）自己と他者が生む空間
 - rR: 欲求・意志（精神内殻①）内なる動機・目的
-- iI: 関係性・共感（精神内殻②）他との深い気づき
+- 私私: 関係性・共感（精神内殻②）他との深い気づき。【私私軸の自己申告】が入力されている場合は、その内容を私私軸の分析の核に据えてください。
 - jJ: 倫理・全体貢献（精神内殻③）全体への調和
 
 【歪みの分類】
@@ -255,11 +323,11 @@ ${issue}
     {"id":"yY","strain_type":"...","strain_level":0,"description":"..."},
     {"id":"zZ","strain_type":"...","strain_level":0,"description":"..."},
     {"id":"rR","strain_type":"...","strain_level":0,"description":"..."},
-    {"id":"私私","strain_type":"...","strain_level":0,"description":"..."},
+    {"id":"私私","strain_type":"...","strain_level":0,"description":"分析者自身の思いを踏まえた関係性の歪みまたは励起（2〜3文）"},
     {"id":"jJ","strain_type":"...","strain_level":0,"description":"..."}
   ],
   "vectors": [
-    {"title":"収束ベクトルのタイトル","description":"具体的な介入方法（2〜3文）","axes":["関連軸ID"],"method":"M1|M2|M3"}
+    {"title":"収束ベクトルのタイトル","description":"具体的な介入方法（2〜3文）。私私軸の自己申告がある場合は分析者が実際に取れる行動を含める。","axes":["関連軸ID"],"method":"M1|M2|M3"}
   ],
   "resolution": {
     "headline":"解決可能な核心課題（一文）",
@@ -297,7 +365,16 @@ function renderFromPaste(){
 }
 
 function renderViz(data){
-  // Axes
+  const selfInput = document.getElementById('selfInput').value.trim();
+
+  const summaryBlock = document.getElementById('selfSummaryBlock');
+  if(selfInput){
+    document.getElementById('selfSummaryText').textContent = selfInput;
+    summaryBlock.style.display = 'block';
+  } else {
+    summaryBlock.style.display = 'none';
+  }
+
   const grid = document.getElementById('axisGrid');
   grid.innerHTML = '';
   AXES.forEach(ax=>{
@@ -305,11 +382,14 @@ function renderViz(data){
     const typeLabel = {destructive:'破壊的歪み',excitative:'励起的歪み',none:'歪みなし'}[d.strain_type]||'—';
     const cls = {destructive:'d',excitative:'e',none:'n'}[d.strain_type]||'n';
     const tagColor = {destructive:'var(--red)',excitative:'var(--green)',none:'var(--muted)'}[d.strain_type];
+    const isSelf = ax.id === '私私';
     const card = document.createElement('div');
-    card.className = 'axis-card';
+    card.className = 'axis-card' + (isSelf ? ' self-axis' : '');
+    const axColor = isSelf ? 'var(--purple)' : tagColor;
     card.innerHTML = `
-      <div class="axis-tag" style="color:${tagColor}">
+      <div class="axis-tag" style="color:${axColor}">
         ${ax.label}<small>${ax.sub}</small><small style="opacity:.6">${ax.shell}</small>
+        ${isSelf && selfInput ? '<small style="color:var(--purple);opacity:.8;margin-top:4px;">● 自己入力</small>' : ''}
       </div>
       <div class="axis-body">
         <div class="strain-label ${cls}">${typeLabel}</div>
@@ -322,7 +402,6 @@ function renderViz(data){
     document.querySelectorAll('.strain-fill').forEach(el=>{ el.style.width=el.dataset.level+'%'; });
   },100);
 
-  // Vectors
   const vlist = document.getElementById('vectorList');
   vlist.innerHTML = '';
   (data.vectors||[]).forEach((v,i)=>{
@@ -342,7 +421,6 @@ function renderViz(data){
     vlist.appendChild(card);
   });
 
-  // Resolution
   const r = data.resolution||{};
   document.getElementById('resolutionBox').innerHTML = `
     <h3>${r.headline||''}</h3>
