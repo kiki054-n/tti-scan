@@ -5,6 +5,7 @@
 **開発者：川上真潔 / kiki054-n**  
 **ライセンス：[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.ja)**
 
+[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 ---
 
 ## 概要
