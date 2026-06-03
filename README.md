@@ -164,7 +164,7 @@ TTI-SCANは「広く使われること」が理論の検証になります。
 
 ```
 TTI-SCAN / Tri-Tetra Integrator
-開発者：川上真潔（Masaaki Kawakami）
+開発者：川上真潔（Naoyuki Kawakami）
 出典：https://github.com/kiki054-n/tti-scan
 ライセンス：CC BY 4.0
 ```
